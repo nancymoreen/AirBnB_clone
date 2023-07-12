@@ -4,8 +4,9 @@ Creating a class BaseModel that defines all
 common attributes/methods for other classes
 """
 
-import uuid
+from uuid import uuid4
 from datetime import datetime
+from models.base_model import BaseModel
 
 class BaseModel:
     """
