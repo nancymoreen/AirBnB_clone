@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 """
-Write a program called console.py that
-contains the entry point of the command interpreter
+This module defines the command interpreter class.
 """
 
+
 import cmd
+import models
 
 class HBNBCommand(cmd.Cmd):
     """
@@ -12,16 +13,15 @@ class HBNBCommand(cmd.Cmd):
     """
     prompt = '(hbnb) '
 
-    def do_quit(self, arg):
+    def do_quit(self, line):
         """
         Quit command to exit the program
         """
         return True
 
-    def do_EOF(self, arg):
+    def do_EOF(self, line):
         """
-        handles the quit command and returns
-        True to exit the program.
+        EOF command to exit the program.
         """
         print("")
         return True
