@@ -23,13 +23,8 @@ class HBNBCommand(cmd.Cmd):
         handles the quit command and returns
         True to exit the program.
         """
-        print()
+        print("")
         return True
 
     if __name__ == '__main__':
-        """
-        block ensures that the program is only executed
-        when the script is run directly and not when
-        imported as a module.
-        """
         HBNBCommand().cmdloop()
