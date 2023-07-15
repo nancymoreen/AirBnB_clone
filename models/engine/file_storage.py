@@ -1,57 +1,36 @@
-#!/usr/bin/python3
-"""
-Module file_storage serializes and
-deserializes JSON types
-"""
-
 import json
-from models.base_model import BaseModel
-from models.user import User
 
 
 class FileStorage:
-    """
-    Custom class for file storage
-    """
-
     __file_path = "file.json"
     __objects = {}
 
     def all(self):
-        """
-        Returns dictionary representation of all objects
-        """
+        """Returns the dictionary __objects."""
         return self.__objects
 
     def new(self, obj):
-        """sets in __objects the object with the key
-        <object class name>.id
-
-        Args:
-            object(obj): object to write
-
-        """
-        self.__objects[obj.__class__.__name__ + '.' + str(obj)] = obj
+        """Sets in __objects the obj with key <obj class name>.id."""
+        key = "{}.{}".format(obj.__class__.__name__, obj.id)
+        self.__objects[key] = obj
 
     def save(self):
-        """
-        serializes __objects to the JSON file
-        (path: __file_path)
-        """
-        with open(self.__file_path, 'w+') as f:
-            json.dump({k: v.to_dict() for k, v in self.__objects.items()
-                       }, f)
+        """Serializes __objects to the JSON file (__file_path)."""
+        json_dict = {}
+        for key, value in self.__objects.items():
+            json_dict[key] = value.to_dict()
+        with open(self.__file_path, "w", encoding="utf-8") as file:
+            json.dump(json_dict, file)
 
     def reload(self):
-        """
-        deserializes the JSON file to __objects, if the JSON
-        file exists, otherwise nothing happens)
-        """
+        """Deserializes the JSON file to __objects."""
         try:
-            with open(self.__file_path, 'r') as f:
-                data = json.loads(f.read())
-                for value in data.values():
-                    cls = value["__class__"]
-                    self.new(eval(cls)(**value))
-        except Exception:
+            with open(self.__file_path, "r", encoding="utf-8") as file:
+                json_dict = json.load(file)
+                for key, value in json_dict.items():
+                    class_name, obj_id = key.split(".")
+                    class_obj = globals()[class_name]
+                    obj = class_obj(**value)
+                    self.__objects[key] = obj
+        except FileNotFoundError:
             pass
