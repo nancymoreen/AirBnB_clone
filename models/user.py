@@ -5,12 +5,13 @@ from models.base_model import BaseModel
 
 class User(BaseModel):
     """
-    Represeneting The User Class
+    Defines class User.
+
     Attributes:
-    email: User's email
-    password: User's password
-    first_name: User's First name
-    last_name: User's last name
+        email (str): The email of the user.
+        password (str): The password of the user.
+        first_name (str): The first name of the user.
+        last_name (str): The last name of the user.
     """
     email = ""
     password = ""

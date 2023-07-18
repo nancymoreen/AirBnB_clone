@@ -1,38 +1,51 @@
 #!/usr/bin/python3
 """Defining File Storage"""
 import json
-import sys
+from models.base_model import BaseModel
 from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class FileStorage:
     """
-    Serializes instances to a JSON file
-    and deserializes JSON file to instances
-    """
-    def serialize(self):
-        """Serializes objects to a JSON file"""
-        obj_dict = {}
-        for obj_id, obj in self.__objects.items():
-            if isinstance(obj, BaseModel):
-                if isinstance(obj, User):
-                    obj_dict[f"{obj.__class__.__name__}.{obj_id}"] = obj.to_dict()
-                else:
-                    obj_dict[obj_id] = obj.to_dict()
-        with open(self.__file_path, "w", encoding="utf-8") as file:
-            json.dump(obj_dict, file)
+    Serializes instances to a JSON file and deserializes
+    JSON file to instances.
 
-    def deserialize(self):
-        """Deserializes objects from a JSON file"""
+    Attributes:
+        __file_path (str): Path to the JSON file.
+        __objects (dict): Store all objects.
+    """
+    __file_path = "file.json"
+    __objects = {}
+
+    def all(self):
+        """ Returns the dictionary __objects. """
+        return FileStorage.__objects
+
+    def new(self, obj):
+        """ Sets in __objects the obj with key<obj class name>.id."""
+        obj_name = obj.__class__.__name__
+        FileStorage.__objects["{}.{}".format(obj_name, obj.id)] = obj
+
+    def save(self):
+        """ Serializes __objects to the JSON file."""
+        obj_dict = FileStorage.__objects
+        objd = {obj: obj_dict[obj].to_dict() for obj in obj_dict.keys()}
+        with open(FileStorage.__file_path, "w") as myfile:
+            json.dump(objd, myfile)
+
+    def reload(self):
+        """Deserialize the JSON file __file_path to __objects, if it exists."""
         try:
-            with open(self.__file_path, "r", encoding="utf-8") as file:
-                obj_dict = json.load(file)
-                for obj_key, obj_data in obj_dict.items():
-                    class_name, instance_id = obj_key.split(".")
-                    if class_name == "User":
-                        obj = User(**obj_data)
-                    else:
-                        obj = BaseModel(**obj_data)
-                        self.__objects[f"{class_name}.{instance_id}"] = obj
+            with open(FileStorage.__file_path) as myfile:
+                objdict = json.load(myfile)
+                for o in objdict.values():
+                    cls_name = o["__class__"]
+                    del o["__class__"]
+                    self.new(eval(cls_name)(**o))
         except FileNotFoundError:
-            pass
+            return
